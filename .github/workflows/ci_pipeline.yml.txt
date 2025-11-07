@@ -1,0 +1,41 @@
+# .github/workflows/ci_pipeline.yml
+
+name: Test and Deploy Simulation (Variant 1) # Назва пайплайну
+
+on:
+  push:
+    branches: [ "main" ] # Запускаємо при пуші в гілку main
+  pull_request:
+    branches: [ "main" ] # Запускаємо при створенні Pull Request у main
+
+jobs:
+  # === КРОК 1: ЗАПУСК ТЕСТІВ ===
+  test:
+    runs-on: ubuntu-latest # Використовуємо стандартне середовище GitHub
+    steps:
+    - name: ⬇️ Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x' # Використовуємо останню версію Python 3
+
+    - name: ⚙️ Install dependencies (pytest)
+      run: pip install -r requirements.txt
+
+    - name: 🚀 Run tests (Крок 1)
+      id: run_tests
+      run: pytest
+      # Якщо цей крок поверне помилку (тести не пройдуть), наступний крок (deploy) НЕ БУДЕ запущений.
+
+  # === КРОК 2: СИМУЛЯЦІЯ ДЕПЛОЮ ===
+  deploy_simulation:
+    needs: test # Обов'язкова умова: цей крок запускається ЛИШЕ ПІСЛЯ успішного завершення job 'test'
+    runs-on: ubuntu-latest
+    steps:
+    - name: ✅ Check Test Status
+      run: echo "Тести успішно пройшли, продовжуємо..."
+
+    - name: 📢 Deployment Simulation (Крок 2)
+      run: echo "Deployed" # Симуляція деплою: вивід повідомлення, як вимагає завдання
